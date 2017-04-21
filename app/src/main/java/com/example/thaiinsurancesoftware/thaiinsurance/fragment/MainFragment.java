@@ -3,11 +3,15 @@ package com.example.thaiinsurancesoftware.thaiinsurance.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.thaiinsurancesoftware.thaiinsurance.R;
+import com.inthecheesefactory.thecheeselibrary.view.SlidingTabLayout;
 
 
 /**
@@ -15,6 +19,9 @@ import com.example.thaiinsurancesoftware.thaiinsurance.R;
  */
 @SuppressWarnings("unused")
 public class MainFragment extends Fragment {
+
+    ViewPager viewPager;
+    SlidingTabLayout slidingTabLayout;
 
     public MainFragment() {
         super();
@@ -41,7 +48,7 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        initInstances(rootView, savedInstanceState);
+        initInstances(rootView);
         return rootView;
     }
 
@@ -50,8 +57,45 @@ public class MainFragment extends Fragment {
     }
 
     @SuppressWarnings("UnusedParameters")
-    private void initInstances(View rootView, Bundle savedInstanceState) {
+    private void initInstances(View rootView) {
         // Init 'View' instance(s) with rootView.findViewById here
+        viewPager = (ViewPager) rootView.findViewById(R.id.viewPager);
+        viewPager.setAdapter(new FragmentStatePagerAdapter(getChildFragmentManager()) {
+            @Override
+            public Fragment getItem(int position) {
+                switch (position) {
+                    case 0:
+                        return FirstFragment.newInstance();
+                    case 1:
+                        return SecondFragment.newInstance();
+
+                    default:
+                        return null;
+                }
+            }
+
+            @Override
+            public int getCount() {
+                return 2;
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                switch (position) {
+                    case 0:
+                        return "First";
+                    case 1:
+                        return "Second";
+
+                    default:
+                        return "";
+                }
+            }
+        });
+        slidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.slidingTabLayout);
+        slidingTabLayout.setDistributeEvenly(true);
+        slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getActivity(), R.color.colorAccent));
+        slidingTabLayout.setViewPager(viewPager);
     }
 
     @Override

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "651217408752",
+    "firebase_url": "https://thai-insurance.firebaseio.com",
+    "project_id": "thai-insurance",
+    "storage_bucket": "thai-insurance.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:651217408752:android:0c14a6be5f493c27",
+        "android_client_info": {
+          "package_name": "com.example.thaiinsurancesoftware.thaiinsurance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "651217408752-e6qdooijiv0m15s0155mdv06ntpi7ra3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.thaiinsurancesoftware.thaiinsurance",
+            "certificate_hash": "d68654a6f2e52d85469b07224f4bd58d1bb58f5c"
+          }
+        },
+        {
+          "client_id": "651217408752-pkdlkkop72hrnp9qihg1kn2mgodf1d4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1Z1HENFiLS1IoGOugBUd_Q03wrqRxaZg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "651217408752-pkdlkkop72hrnp9qihg1kn2mgodf1d4r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

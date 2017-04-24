@@ -94,6 +94,7 @@ public class MainFragment extends Fragment {
         });
         slidingTabLayout = (SlidingTabLayout) rootView.findViewById(R.id.slidingTabLayout);
         slidingTabLayout.setDistributeEvenly(true);
+
         slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(getActivity(), R.color.colorAccent));
         slidingTabLayout.setViewPager(viewPager);
     }

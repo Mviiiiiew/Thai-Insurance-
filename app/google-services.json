@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "651217408752-lfpedhlboda6m40qilurs21e7a7bu5vn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.thaiinsurancesoftware.thaiinsurance",
+            "certificate_hash": "6ff73f9c85ed007f93ebf7ab2d59ba7a9af04877"
+          }
+        },
+        {
           "client_id": "651217408752-e6qdooijiv0m15s0155mdv06ntpi7ra3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

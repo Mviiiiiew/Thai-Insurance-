@@ -4,19 +4,23 @@ import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -31,8 +35,11 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -40,18 +47,22 @@ import java.io.IOException;
  */
 @SuppressWarnings("unused")
 public class FirstFragment extends Fragment implements View.OnClickListener {
-    Button btn_browse_image;
-    Button btn_upload_image;
+    ImageButton imgbtn_browse_image;
+    ImageButton imgbtn_browse_camera;
+    ImageButton imgbtn_upload_image;
     EditText edit_image_name;
     ImageView imageView;
     Uri imgUri;
 
     private StorageReference mStorageRef;
     private DatabaseReference mDatabaseRef;
+    private String mImageFileLocation = "";
 
     public static final String FB_STORAGE_PATH = "image/";
     public static final String FB_DATABASE_PATH = "image";
     public static final int REQUEST_CODE = 1234;
+    public static final int REQUEST_CAMERA = 12345;
+
 
     public FirstFragment() {
         super();
@@ -92,13 +103,15 @@ public class FirstFragment extends Fragment implements View.OnClickListener {
 
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
-        btn_browse_image = (Button) rootView.findViewById(R.id.btn_browse_image);
-        btn_upload_image = (Button) rootView.findViewById(R.id.btn_upload_image);
+        imgbtn_browse_image = (ImageButton) rootView.findViewById(R.id.imgbtn_browse_image);
+        imgbtn_browse_camera = (ImageButton) rootView.findViewById(R.id.imgbtn_browse_camera);
+        imgbtn_upload_image = (ImageButton) rootView.findViewById(R.id.imgbtn_upload_image);
         imageView = (ImageView) rootView.findViewById(R.id.imageView);
         edit_image_name = (EditText) rootView.findViewById(R.id.edit_image_name);
 
-        btn_browse_image.setOnClickListener(this);
-        btn_upload_image.setOnClickListener(this);
+        imgbtn_browse_image.setOnClickListener(this);
+        imgbtn_browse_camera.setOnClickListener(this);
+        imgbtn_upload_image.setOnClickListener(this);
 
         // Init 'View' instance(s) with rootView.findViewById here
     }
@@ -132,12 +145,26 @@ public class FirstFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if (btn_browse_image == view) {
+        if (imgbtn_browse_image == view) {
             Intent intent = new Intent();
             intent.setType("image/*");
             intent.setAction(Intent.ACTION_GET_CONTENT);
             startActivityForResult(Intent.createChooser(intent, "Select Image"), REQUEST_CODE);
-        } else if (btn_upload_image == view) {
+        } else if (imgbtn_browse_camera == view) {
+
+            Intent intent = new Intent();
+            intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            intent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photoFile));
+            startActivityForResult(intent, REQUEST_CAMERA);
+
+
+        } else if (imgbtn_upload_image == view) {
             if (imgUri != null) {
                 final ProgressDialog dialog = new ProgressDialog(getActivity());
                 dialog.setTitle("Upload Image");
@@ -170,22 +197,22 @@ public class FirstFragment extends Fragment implements View.OnClickListener {
                             public void onFailure(@NonNull Exception e) {
                                 dialog.dismiss();
                                 Toast.makeText(getActivity(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.d("xxx", e.toString());
 
                             }
                         })
                         .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                        int bytesTransferred = (int) taskSnapshot.getBytesTransferred();
-                        int totalBytes = (int) taskSnapshot.getTotalByteCount();
-                        double progress = (100.0 * bytesTransferred / taskSnapshot.getTotalByteCount());
+                            @Override
+                            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                int bytesTransferred = (int) taskSnapshot.getBytesTransferred();
+                                int totalBytes = (int) taskSnapshot.getTotalByteCount();
+                                double progress = (100.0 * bytesTransferred / taskSnapshot.getTotalByteCount());
 
-                        dialog.setMessage("Uploaded " + (int)progress + "%");
+                                dialog.setMessage("Uploaded " + (int) progress + "%");
 
 
-
-                    }
-                });
+                            }
+                        });
 
 
             } else {
@@ -199,6 +226,8 @@ public class FirstFragment extends Fragment implements View.OnClickListener {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE && resultCode == getActivity().RESULT_OK && data.getData() != null) {
             imgUri = data.getData();
+            Log.d("REQUEST_CODE", imgUri + "");
+
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), imgUri);
                 imageView.setImageBitmap(bitmap);
@@ -207,6 +236,24 @@ public class FirstFragment extends Fragment implements View.OnClickListener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            if (requestCode == REQUEST_CAMERA && resultCode == getActivity().RESULT_OK) {
+                // Toast.makeText(getActivity(), "Picture taken successfully", Toast.LENGTH_SHORT).show();
+               // imgUri = data.getData();
+               // Log.d("REQUEST_CAMERA", imgUri + "");
+                try {
+                  //  Bundle extras = data.getExtras();
+                  //  Bitmap photoCapture = (Bitmap) extras.get("data");
+                 //   imageView.setImageBitmap(photoCapture);
+                    Bitmap photoCapture = BitmapFactory.decodeFile(mImageFileLocation);
+                    imageView.setImageBitmap(photoCapture);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
         }
     }
 
@@ -214,6 +261,18 @@ public class FirstFragment extends Fragment implements View.OnClickListener {
         ContentResolver contentResolver = getActivity().getContentResolver();
         MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
         return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "IMAGE" + timeStamp + "_";
+        File storageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        File image = File.createTempFile(imageFileName, ".jpg", storageDirectory);
+        mImageFileLocation = image.getAbsolutePath();
+        Log.d("mImageFileLocation", mImageFileLocation + "");
+
+        return image;
     }
 
 }

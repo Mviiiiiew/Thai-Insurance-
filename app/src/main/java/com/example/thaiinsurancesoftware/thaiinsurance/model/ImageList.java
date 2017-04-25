@@ -29,4 +29,8 @@ public class ImageList {
         this.name = name;
         this.uri = uri;
     }
+
+    public  ImageList(){
+
+    }
 }
